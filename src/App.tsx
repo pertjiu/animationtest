@@ -2,12 +2,44 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { motion, useMotionValue, animate } from "motion/react";
-import { Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
-import { useState, useEffect } from "react";
+import {
+  Tooltip,
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  BarChart,
+  Bar,
+  LabelList,
+} from "recharts";
+import { useState, useEffect, useRef } from "react";
+import { CountUp } from "@/components/ui/count-up";
+
+interface ScreenType {
+  id: number;
+  title: string;
+  subtitle: string;
+  isWelcome?: boolean;
+  graph?: 'circle' | 'line' | 'bar' | 'horizontal-bar' | 'double-line';
+  value?: number;
+  dataKey?: string;
+  dataKey2?: string;
+  data?: any[];
+  icon?: string;
+  prefix?: string;
+  invertPerformanceColors?: boolean;
+  screenType?: 'summary' | 'nextSteps';
+}
 
 export default function FinancialWrapped() {
   const x = useMotionValue(0);
   const [screenWidth, setScreenWidth] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
     setScreenWidth(window.innerWidth);
@@ -16,7 +48,7 @@ export default function FinancialWrapped() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const screens = [
+  const screens: ScreenType[] = [
     {
       id: 0,
       title: "Hey, [Naam],",
@@ -25,79 +57,77 @@ export default function FinancialWrapped() {
     },
     {
       id: 1,
-      title: "Je omzet deze maand is €12.480",
-      text: "Dat is +8% vergeleken met vorige maand",
-      graph: "line",
-      dataKey: "omzet",
-      data: [
-        { name: 'Juni', omzet: 8200 },
-        { name: 'Juli', omzet: 9500 },
-        { name: 'Augustus', omzet: 10200 },
-        { name: 'September', omzet: 11500 },
-        { name: 'Oktober', omzet: 11000 },
-        { name: 'November', omzet: 12480 },
-      ],
+      title: "Jouw netto winst",
+      subtitle: "Dit is jouw nette winst deze maand.",
+      graph: "circle",
+      value: 3250,
     },
     {
       id: 2,
-      title: "Deze drie klanten hadden de grootste omzet",
-      text: "klant a, klant b en klant c",
-      animation: true,
-    },
-    {
-      id: 3,
-      title: "Je kosten deze maand zijn €9.230",
-      text: "Dat is -4% lager dan vorige maand.",
+      title: "Jouw totale kosten",
+      subtitle: "",
       graph: "line",
       dataKey: "kosten",
       data: [
-        { name: 'Juni', kosten: 9500 },
-        { name: 'Juli', kosten: 9800 },
-        { name: 'Augustus', kosten: 10500 },
-        { name: 'September', kosten: 10000 },
-        { name: 'Oktober', kosten: 9600 },
-        { name: 'November', kosten: 9230 },
+        { name: "Oktober", kosten: 9600 },
+        { name: "November", kosten: 9230 },
+      ],
+      invertPerformanceColors: true,
+    },
+    {
+      id: 3,
+      title: "Jouw omzet toppers",
+      subtitle: "Dit zijn jouw drie grootste partners deze maand",
+      graph: "bar",
+      data: [
+        { name: "Partner A", omzet: 4500, rank: 2 },
+        { name: "Partner B", omzet: 6200, rank: 1 },
+        { name: "Partner C", omzet: 3800, rank: 3 },
       ],
     },
     {
       id: 4,
-      title: "Je drie grootste kostenposten waren:",
-      text: "Salarissen €4.200, Inkoop €2.900 en Marketing €1.100. Deze drie posten maken samen 85% van je totale kosten uit.",
-      graph: "pie",
+      title: "Jouw grootste partnerkosten",
+      subtitle: "Dit is een overzicht van jouw drie duurste partners deze maand.",
+      graph: "horizontal-bar",
       data: [
-        { name: 'Salarissen', value: 4200 },
-        { name: 'Inkoop', value: 2900 },
-        { name: 'Marketing', value: 1100 },
-        { name: 'Overig', value: 1030 },
+        { name: "Partner X", kosten: 2100 },
+        { name: "Partner Y", kosten: 1800 },
+        { name: "Partner Z", kosten: 1500 },
       ],
     },
     {
       id: 5,
-      title: "De maand krijg/moet je zoveel euro belasting terug/betalen.",
+      title: "Jouw cashbuffer deze maand",
+      subtitle: "",
+      graph: "double-line",
+      data: [
+        { name: "Oktober", runway: 10, days: 26 },
+        { name: "November", runway: 9, days: 24 },
+      ],
+      dataKey: "runway",
+      dataKey2: "days",
     },
     {
       id: 6,
-      title: "Deze maand laat je financiële positie twee belangrijke signalen zien:",
-      text: "je cash runway neemt af/toe en het aantal days of cash on hand daalt/stijgt. Beide cijfers geven inzicht in hoe lang je bedrijf kan blijven draaien met de huidige cashsitie en uitgaven.",
-      graph: "double-line",
-      data: [
-        { name: 'Juni', runway: 12, days: 30 },
-        { name: 'Juli', runway: 11, days: 28 },
-        { name: 'Augustus', runway: 10, days: 25 },
-        { name: 'September', runway: 11, days: 28 },
-        { name: 'Oktober', runway: 10, days: 26 },
-        { name: 'November', runway: 9, days: 24 },
-      ],
+      title: "Jouw belasting deze maand",
+      subtitle: "Zoveel belasting krijg jij/ moet je betalen",
+      graph: "circle",
+      value: 5759,
+      icon: "money-bag",
+      prefix: "+€",
     },
     {
       id: 7,
-      title: "Samenvatting van de maand",
-      text: "Deze maand was een succesvolle maand met een omzetgroei van 8% en een kostenverlaging van 4%. Je winst is hierdoor gestegen. De cashpositie is stabiel, maar de cash runway verdient aandacht."
+      title: "Jouw samenvatting",
+      subtitle: "Een overzicht van jouw financiele maand.",
+      screenType: "summary",
     },
     {
       id: 8,
-      title: "Wat kan je nu doen?",
-      text: "Focus op het verhogen van de cash runway. Analyseer de grootste kostenposten en kijk waar je kunt besparen. Overweeg een gesprek met een financieel adviseur om de mogelijkheden te bespreken."
+      title: "Wat nu?",
+      subtitle: "Volgende stappen en aanbevelingen.",
+      screenType: "nextSteps",
     },
   ];
 
@@ -108,6 +138,7 @@ export default function FinancialWrapped() {
     const current = x.get();
     const rawIndex = Math.round((current + offset) / -screenWidth);
     const clampedIndex = Math.max(0, Math.min(screens.length - 1, rawIndex));
+    setCurrentIndex(clampedIndex);
 
     animate(x, -clampedIndex * screenWidth, {
       type: "spring",
@@ -129,149 +160,349 @@ export default function FinancialWrapped() {
         dragElastic={0.15}
         onDragEnd={handleSnap}
       >
-        {screens.map((screen) => (
-          <div
+        {screens.map((screen, index) => (
+          <Screen
             key={screen.id}
-            className="w-screen h-screen flex items-center justify-center p-10"
-          >
-            <Card className="max-w-lg w-full rounded-2xl shadow-lg bg-white border-gray-200">
-              <CardContent className="space-y-6 text-center">
-                {screen.isWelcome ? (
-                  <div className="flex flex-col items-center justify-center space-y-8 text-slate-800">
-                    <div className="text-left self-start">
-                      <h1 className="text-4xl font-bold">{screen.title}</h1>
-                      <p className="text-3xl">{screen.subtitle}</p>
-                    </div>
-
-                    <div className="relative w-48 h-48 flex flex-col items-center justify-center border-2 border-blue-200 rounded-full">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-blue-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                      </svg>
-                      <h2 className="text-2xl font-bold">November 2025</h2>
-                      <p className="text-sm">Dit was jouw maand</p>
-                    </div>
-
-                    <div className="flex items-center space-x-2">
-                      <div className="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 15l7-7 7 7" />
-                        </svg>
-                      </div>
-                      <span className="text-2xl font-bold">PocketCFO</span>
-                    </div>
-                    <span className="bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-full">Wrapped</span>
-                  </div>
-                ) : (
-                  <>
-                    <motion.h1
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.6 }}
-                      className="text-4xl font-semibold"
-                    >
-                      {screen.title}
-                    </motion.h1>
-
-                    {screen.text && !screen.animation && (
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 0.8 }}
-                        className="text-base text-gray-600"
-                      >
-                        {screen.text}
-                      </motion.p>
-                    )}
-
-                    {screen.animation && (
-                      <div className="w-full flex flex-col items-center justify-center space-y-4">
-                        {screen.text.replace(' en ', ', ').split(', ').map((customer, index) => (
-                          <motion.div
-                            key={index}
-                            initial={{ opacity: 0, y: 50 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
-                            className="text-xl font-medium p-3 bg-blue-100 rounded-lg w-full"
-                          >
-                            {customer}
-                          </motion.div>
-                        ))}
-                      </div>
-                    )}
-
-                    {screen.graph === "line" && screen.data && screen.dataKey && (
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 120, damping: 12 }}
-                        className="w-full h-64 flex items-center justify-center"
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={screen.data}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Line type="monotone" dataKey={screen.dataKey} stroke="#3b82f6" activeDot={{ r: 8 }} />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </motion.div>
-                    )}
-
-                    {screen.graph === "pie" && screen.data && (
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 120, damping: 12 }}
-                        className="w-full h-64 flex items-center justify-center"
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <PieChart>
-                            <Tooltip />
-                            <Pie
-                              data={screen.data}
-                              dataKey="value"
-                              nameKey="name"
-                              cx="50%"
-                              cy="50%"
-                              outerRadius={80}
-                              label
-                            >
-                              {screen.data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                              ))}
-                            </Pie>
-                          </PieChart>
-                        </ResponsiveContainer>
-                      </motion.div>
-                    )}
-
-                    {screen.graph === "double-line" && screen.data && (
-                      <motion.div
-                        initial={{ scale: 0.8, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ type: "spring", stiffness: 120, damping: 12 }}
-                        className="w-full h-64 flex items-center justify-center"
-                      >
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={screen.data}>
-                            <CartesianGrid strokeDasharray="3 3" />
-                            <XAxis dataKey="name" />
-                            <YAxis />
-                            <Tooltip />
-                            <Line type="monotone" dataKey="runway" stroke="#3b82f6" name="Cash Runway" />
-                            <Line type="monotone" dataKey="days" stroke="#93c5fd" name="Days of Cash" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </motion.div>
-                    )}
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+            screen={screen}
+            isActive={index === currentIndex}
+          />
         ))}
       </motion.div>
+    </div>
+  );
+}
+
+function DynamicSubtitle({ screen }: { screen: ScreenType }) {
+  const { data, dataKey } = screen;
+  if (!data || data.length < 2 || !dataKey) return null;
+
+  const previousValue = data[0][dataKey];
+  const currentValue = data[1][dataKey];
+
+  const percentageChange = ((currentValue - previousValue) / previousValue) * 100;
+  const isPositive = percentageChange > 0;
+
+  let color = isPositive ? "text-green-500" : "text-red-500";
+  let changeText = isPositive ? `${Math.round(percentageChange)}% winst` : `${Math.round(Math.abs(percentageChange))}% verlies`;
+
+  if (screen.invertPerformanceColors) {
+    color = isPositive ? "text-red-500" : "text-green-500";
+    changeText = isPositive ? `${Math.round(percentageChange)}% meer kosten` : `${Math.round(Math.abs(percentageChange))}% minder kosten`;
+  }
+
+  return (
+    <motion.p
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.8 }}
+      className="text-base text-gray-600"
+    >
+      Je hebt <span className={color}>{changeText}</span> gedraaid kijk goed uit dat je niet meer verliest.
+    </motion.p>
+  );
+}
+
+function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean }) {
+  const ref = useRef(null);
+
+  const maxKosten = screen.data && screen.graph === 'horizontal-bar'
+    ? Math.max(...screen.data.map((item: any) => item.kosten))
+    : 0;
+
+  return (
+    <div
+      ref={ref}
+      className="w-screen h-screen flex items-center justify-center p-10"
+    >
+      <Card className="max-w-lg w-full rounded-2xl shadow-lg bg-white border-gray-200">
+        <CardContent className="space-y-6 text-center p-6">
+          {screen.isWelcome ? (
+            <div className="flex flex-col items-center justify-center space-y-8 text-slate-800">
+              <div className="text-left self-start">
+                <h1 className="text-4xl font-bold">{screen.title}</h1>
+                <p className="text-3xl">{screen.subtitle}</p>
+              </div>
+
+              <div className="relative w-48 h-48 flex flex-col items-center justify-center border-2 border-blue-200 rounded-full">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-blue-500 mb-2"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  />
+                </svg>
+                <h2 className="text-2xl font-bold">November 2025</h2>
+                <p className="text-sm">Dit was jouw maand</p>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <img src="/logo.svg" className="w-10 h-10" />
+                <span className="text-2xl font-bold">PocketCFO</span>
+              </div>
+              <span className="bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-full">
+                Wrapped
+              </span>
+            </div>
+          ) : (
+            <>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
+                transition={{ duration: 0.6 }}
+                className="text-4xl font-semibold"
+              >
+                {screen.title}
+              </motion.h1>
+
+              {(screen.id === 2 || screen.id === 5) ? (
+                <DynamicSubtitle screen={screen} />
+              ) : (
+                screen.subtitle && (
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: isActive ? 1 : 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="text-base text-gray-600"
+                  >
+                    {screen.subtitle}
+                  </motion.p>
+                )
+              )}
+
+              {screen.screenType === "summary" && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Netto Winst</span>
+                    <span className="font-bold">€3250</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Totale Kosten</span>
+                    <span className="font-bold">€9230</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Top Partner</span>
+                    <span className="font-bold">Partner B</span>
+                  </div>
+                  <button className="w-full bg-slate-800 text-white font-semibold py-2 px-4 rounded-full mt-4">
+                    Deel
+                  </button>
+                </div>
+              )}
+
+              {screen.screenType === "nextSteps" && (
+                <div className="space-y-4">
+                  <a
+                    href="https://pocketcfo.io/nl/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full block bg-blue-500 text-white font-semibold py-2 px-4 rounded-full mt-4"
+                  >
+                    Bezoek PocketCFO
+                  </a>
+                  <p className="text-gray-600">
+                    Neem contact op met je partner voor meer informatie en advies.
+                  </p>
+                </div>
+              )}
+
+              {screen.graph === "circle" && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{
+                    scale: isActive ? 1 : 0.8,
+                    opacity: isActive ? 1 : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 120, damping: 12 }}
+                  className="w-full h-64 flex items-center justify-center"
+                >
+                  <div className="relative w-48 h-48 flex flex-col items-center justify-center border-2 border-blue-200 rounded-full">
+                    {screen.icon === "money-bag" && (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-10 w-10 text-blue-500 mb-2"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2zm0 0V8m0 11a2 2 0 100-4 2 2 0 000 4z"
+                        />
+                      </svg>
+                    )}
+                    <h2 className="text-3xl font-bold">
+                      <CountUp
+                        value={screen.value}
+                        formatter={(v) => `${screen.prefix || "€"}${Math.round(v)}`}
+                        isActive={isActive}
+                      />
+                    </h2>
+                  </div>
+                </motion.div>
+              )}
+
+              {screen.graph === "line" &&
+                screen.data &&
+                screen.dataKey && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{
+                      scale: isActive ? 1 : 0.8,
+                      opacity: isActive ? 1 : 0,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 12,
+                    }}
+                    className="w-full h-64 flex items-center justify-center"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={screen.data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={screen.dataKey}
+                          stroke="#3b82f6"
+                          activeDot={{ r: 8 }}
+                          animationDuration={1000}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </motion.div>
+                )}
+
+              {screen.graph === "bar" && screen.data && (
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{
+                    scale: isActive ? 1 : 0.8,
+                    opacity: isActive ? 1 : 0,
+                  }}
+                  transition={{ type: "spring", stiffness: 120, damping: 12 }}
+                  className="w-full h-64 flex items-center justify-center"
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={screen.data}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar
+                        dataKey="omzet"
+                        fill="#3b82f6"
+                        animationDuration={1000}
+                      >
+                        <LabelList dataKey="rank" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </motion.div>
+              )}
+
+              {screen.graph === "horizontal-bar" && screen.data && (
+                <div className="w-full flex flex-col items-center justify-center space-y-4">
+                  {screen.data.map((item:any, index:number) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{
+                        opacity: isActive ? 1 : 0,
+                        x: isActive ? 0 : -50,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 10,
+                        delay: index * 0.2,
+                      }}
+                      className="w-full"
+                    >
+                      <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
+                        <span className="font-medium">{item.name}</span>
+                        <span className="font-bold">
+                          <CountUp value={item.kosten} isActive={isActive} />
+                        </span>
+                      </div>
+                      <div className="h-2 bg-blue-200 rounded-full mt-1">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: isActive
+                              ? `${(item.kosten / maxKosten) * 100}%`
+                              : "0%",
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 100,
+                            damping: 10,
+                            delay: index * 0.2,
+                          }}
+                          className="h-full bg-blue-500 rounded-full"
+                        ></motion.div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+
+              {screen.graph === "double-line" &&
+                screen.data &&
+                screen.dataKey &&
+                screen.dataKey2 && (
+                  <motion.div
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{
+                      scale: isActive ? 1 : 0.8,
+                      opacity: isActive ? 1 : 0,
+                    }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 120,
+                      damping: 12,
+                    }}
+                    className="w-full h-64 flex items-center justify-center"
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <LineChart data={screen.data}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip />
+                        <Line
+                          type="monotone"
+                          dataKey={screen.dataKey}
+                          stroke="#3b82f6"
+                          name="Cash Runway"
+                          animationDuration={1000}
+                        />
+                        <Line
+                          type="monotone"
+                          dataKey={screen.dataKey2}
+                          stroke="#93c5fd"
+                          name="Days of Cash"
+                          animationDuration={1000}
+                        />
+                      </LineChart>
+                    </ResponsiveContainer>
+                  </motion.div>
+                )}
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
