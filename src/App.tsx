@@ -92,9 +92,9 @@ export default function FinancialWrapped() {
       subtitle: "Dit is een overzicht van jouw drie duurste partners deze maand.",
       graph: "horizontal-bar",
       data: [
-        { name: "Partner X", kosten: 2100 },
-        { name: "Partner Y", kosten: 1800 },
-        { name: "Partner Z", kosten: 1500 },
+        { name: "Partner X", value: 2100 },
+        { name: "Partner Y", value: 1800 },
+        { name: "Partner Z", value: 1500 },
       ],
     },
     {
@@ -224,8 +224,8 @@ function DynamicSubtitle({ screen }: { screen: ScreenType }) {
 function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean }) {
   const ref = useRef(null);
 
-  const maxKosten = screen.data && screen.graph === 'horizontal-bar'
-    ? Math.max(...screen.data.map((item: any) => item.kosten))
+  const maxValue = screen.data && screen.graph === 'horizontal-bar'
+    ? Math.max(...screen.data.map((item: any) => item.value))
     : 0;
 
   return (
@@ -438,14 +438,14 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                         <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
                           <span className="font-medium">{item.name}</span>
                           <span className="font-bold">
-                            <CountUp value={item.kosten} isActive={isActive} />
+                            <CountUp value={item.value} isActive={isActive} />
                           </span>
                         </div>
                         <div className="h-2 bg-blue-200 rounded-full mt-1">
                           <motion.div
                             initial={{ width: 0 }}
                             animate={{
-                              width: isActive ? `${(item.kosten / maxKosten) * 100}%` : "0%",
+                              width: isActive ? `${(item.value / maxValue) * 100}%` : "0%",
                             }}
                             transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
                             className="h-full bg-blue-500 rounded-full"
