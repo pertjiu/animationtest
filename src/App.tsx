@@ -220,6 +220,7 @@ function DynamicSubtitle({ screen }: { screen: ScreenType }) {
   );
 }
 
+
 function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean }) {
   const ref = useRef(null);
 
@@ -351,7 +352,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                       <h2 className="text-3xl font-bold">
                         <CountUp
                           value={screen.value || 0}
-                          formatter={(v) => `${screen.prefix || "€"}${Math.round(v)}`}
+                          formatter={(v) => `${screen.value || "€"}${Math.round(v)}`}
                           isActive={isActive}
                           delay={1.5}
                         />
@@ -423,51 +424,37 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                 </motion.div>
               )}
 
-              {screen.graph === "horizontal-bar" && screen.data && (
-                <div className="w-full flex flex-col items-center justify-center space-y-4">
-                  {screen.data.map((item:any, index:number) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, x: -50 }}
-                      animate={{
-                        opacity: isActive ? 1 : 0,
-                        x: isActive ? 0 : -50,
-                      }}
-                      transition={{
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 10,
-                        delay: index * 0.2,
-                      }}
-                      className="w-full"
-                    >
-                      <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
-                        <span className="font-medium">{item.name}</span>
-                        <span className="font-bold">
-                          <CountUp value={item.kosten} isActive={isActive} />
-                        </span>
-                      </div>
-                      <div className="h-2 bg-blue-200 rounded-full mt-1">
-                        <motion.div
-                          initial={{ width: 0 }}
-                          animate={{
-                            width: isActive
-                              ? `${(item.kosten / maxKosten) * 100}%`
-                              : "0%",
-                          }}
-                          transition={{
-                            type: "spring",
-                            stiffness: 100,
-                            damping: 10,
-                            delay: index * 0.2,
-                          }}
-                          className="h-full bg-blue-500 rounded-full"
-                        ></motion.div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+
+                {screen.graph === "horizontal-bar" && screen.data && (
+                  <div className="w-full flex flex-col items-center justify-center space-y-4">
+                    {screen.data.map((item: any, index: number) => (
+                      <motion.div
+                        key={index}
+                        initial={{ opacity: 0, x: -50 }}
+                        animate={{ opacity: isActive ? 1 : 0, x: isActive ? 0 : -50 }}
+                        transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
+                        className="w-full"
+                      >
+                        <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
+                          <span className="font-medium">{item.name}</span>
+                          <span className="font-bold">
+                            <CountUp value={item.kosten} isActive={isActive} />
+                          </span>
+                        </div>
+                        <div className="h-2 bg-blue-200 rounded-full mt-1">
+                          <motion.div
+                            initial={{ width: 0 }}
+                            animate={{
+                              width: isActive ? `${(item.kosten / maxKosten) * 100}%` : "0%",
+                            }}
+                            transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
+                            className="h-full bg-blue-500 rounded-full"
+                          ></motion.div>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
 
               {screen.graph === "double-line" &&
                 screen.data &&
