@@ -4,11 +4,12 @@ import { useEffect, useRef } from "react";
 interface CountUpProps {
   value: number;
   duration?: number;
+  delay?: number;
   formatter?: (value: number) => string;
   isActive: boolean;
 }
 
-export function CountUp({ value, duration = 1, formatter = (v) => `€${Math.round(v)}`, isActive }: CountUpProps) {
+export function CountUp({ value, duration = 1, delay = 0, formatter = (v) => `€${Math.round(v)}`, isActive }: CountUpProps) {
   const ref = useRef<HTMLSpanElement>(null);
   const initialValue = formatter(0);
 
@@ -20,11 +21,11 @@ export function CountUp({ value, duration = 1, formatter = (v) => `€${Math.rou
             ref.current.textContent = formatter(progress * value);
           }
         },
-        { duration, ease: "ease-out" }
+        { duration, ease: "ease-out", delay }
       );
       return () => controls.stop();
     }
-  }, [value, duration, formatter, isActive]);
+  }, [value, duration, formatter, isActive, delay]);
 
   return <span ref={ref}>{initialValue}</span>;
 }

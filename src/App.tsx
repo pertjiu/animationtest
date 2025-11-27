@@ -120,6 +120,12 @@ export default function FinancialWrapped() {
     },
     {
       id: 7,
+      title: "Jouw samenvatting",
+      subtitle: "Een overzicht van jouw financiele maand.",
+      screenType: "summary",
+    },
+    {
+      id: 8,
       title: "Wat nu?",
       subtitle: "Volgende stappen en aanbevelingen.",
       screenType: "nextSteps",
@@ -288,6 +294,26 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                 )
               )}
 
+              {/* {screen.screenType === "summary" && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Netto Winst</span>
+                    <span className="font-bold">€{screens.find(s => s.id === 1)?.value}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Totale Kosten</span>
+                    <span className="font-bold">€{screens.find(s => s.id === 2)?.data?.[1].kosten}</span>
+                  </div>
+                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span className="font-medium">Top Partner</span>
+                    <span className="font-bold">{screens.find(s => s.id === 3)?.data?.reduce((prev, current) => (prev.omzet > current.omzet) ? prev : current).name}</span>
+                  </div>
+                  <button className="w-full bg-slate-800 text-white font-semibold py-2 px-4 rounded-full mt-4">
+                    Deel
+                  </button>
+                </div>
+              )} */}
+
               {screen.screenType === "nextSteps" && (
                 <div className="space-y-4">
                   <a
@@ -299,7 +325,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                     Bezoek PocketCFO
                   </a>
                   <p className="text-gray-600">
-                    Of Neem contact op met je partner voor meer informatie en advies.
+                    Neem contact op met je partner voor meer informatie en advies.
                   </p>
                 </div>
               )}
@@ -315,11 +341,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                   className="w-full h-64 flex items-center justify-center"
                 >
                   <div className="relative w-48 h-48 flex flex-col items-center justify-center">
-                    <CircularProgressBar
-                        isActive={isActive}
-                        value={screen.value ?? 0}
-                      />
-
+                    <CircularProgressBar isActive={isActive} />
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: isActive ? 1 : 0 }}
@@ -331,6 +353,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                           value={screen.value || 0}
                           formatter={(v) => `${screen.prefix || "€"}${Math.round(v)}`}
                           isActive={isActive}
+                          delay={1.5}
                         />
                       </h2>
                     </motion.div>
