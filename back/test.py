@@ -1,6 +1,7 @@
 import pandas as pd
 import calendar
 from datetime import datetime, timedelta
+import json
 
 df = pd.read_csv('dotcom-wrapped/data/wrapped_bank_account_4.csv', on_bad_lines="skip")
 
@@ -384,4 +385,6 @@ Account = MoneyChecker(df)
 #days_of_cash_on_hand = runway * 31
 #print(days_of_cash_on_hand)
 
-print(Account.generateOutput('2025-10'))
+output = Account.generateOutput('2025-10')
+with open('public/data.json', 'w') as f:
+    json.dump(output, f, indent=4)

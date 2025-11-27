@@ -49,7 +49,7 @@ export default function FinancialWrapped() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const screens: ScreenType[] = [
+  const initialScreens: ScreenType[] = [
     {
       id: 0,
       title: "Hey, [Naam],",
@@ -131,6 +131,15 @@ export default function FinancialWrapped() {
       screenType: "nextSteps",
     },
   ];
+
+  const [screens, setScreens] = useState<ScreenType[]>(initialScreens);
+
+  useEffect(() => {
+    fetch("/data.json")
+      .then((response) => response.json())
+      .then((data) => setScreens(data))
+      .catch((error) => console.error("Failed to load dynamic data, using fallback.", error));
+  }, []);
 
   const COLORS = ["#3b82f6", "#93c5fd", "#60a5fa", "#1d4ed8"];
 
