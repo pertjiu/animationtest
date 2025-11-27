@@ -19,6 +19,7 @@ import {
 } from "recharts";
 import { useState, useEffect, useRef } from "react";
 import { CountUp } from "@/components/ui/count-up";
+import { CircularProgressBar } from "@/components/ui/circular-progress-bar";
 
 interface ScreenType {
   id: number;
@@ -119,12 +120,6 @@ export default function FinancialWrapped() {
     },
     {
       id: 7,
-      title: "Jouw samenvatting",
-      subtitle: "Een overzicht van jouw financiele maand.",
-      screenType: "summary",
-    },
-    {
-      id: 8,
       title: "Wat nu?",
       subtitle: "Volgende stappen en aanbevelingen.",
       screenType: "nextSteps",
@@ -182,12 +177,28 @@ function DynamicSubtitle({ screen }: { screen: ScreenType }) {
   const percentageChange = ((currentValue - previousValue) / previousValue) * 100;
   const isPositive = percentageChange > 0;
 
-  let color = isPositive ? "text-green-500" : "text-red-500";
-  let changeText = isPositive ? `${Math.round(percentageChange)}% winst` : `${Math.round(Math.abs(percentageChange))}% verlies`;
+  let color: string;
+  let changeText: string;
+  let performanceMessage: string;
 
   if (screen.invertPerformanceColors) {
+    // Higher value is worse (e.g., costs)
     color = isPositive ? "text-red-500" : "text-green-500";
-    changeText = isPositive ? `${Math.round(percentageChange)}% meer kosten` : `${Math.round(Math.abs(percentageChange))}% minder kosten`;
+    changeText = isPositive
+      ? `${Math.round(percentageChange)}% meer kosten`
+      : `${Math.round(Math.abs(percentageChange))}% minder kosten`;
+    performanceMessage = isPositive
+      ? "probeer je kosten te verlagen."
+      : "goed bezig met het verlagen van je kosten!";
+  } else {
+    // Higher value is better (e.g., profit)
+    color = isPositive ? "text-green-500" : "text-red-500";
+    changeText = isPositive
+      ? `${Math.round(percentageChange)}% winst`
+      : `${Math.round(Math.abs(percentageChange))}% verlies`;
+    performanceMessage = isPositive
+      ? "dat is een mooie vooruitgang!"
+      : "kijk goed uit dat je niet meer verliest.";
   }
 
   return (
@@ -197,7 +208,8 @@ function DynamicSubtitle({ screen }: { screen: ScreenType }) {
       transition={{ duration: 0.8 }}
       className="text-base text-gray-600"
     >
-      Je hebt <span className={color}>{changeText}</span> gedraaid kijk goed uit dat je niet meer verliest.
+      Je hebt <span className={color}>{changeText}</span> gedraaid,{" "}
+      {performanceMessage}
     </motion.p>
   );
 }
@@ -276,26 +288,6 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                 )
               )}
 
-              {screen.screenType === "summary" && (
-                <div className="space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
-                    <span className="font-medium">Netto Winst</span>
-                    <span className="font-bold">€3250</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
-                    <span className="font-medium">Totale Kosten</span>
-                    <span className="font-bold">€9230</span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
-                    <span className="font-medium">Top Partner</span>
-                    <span className="font-bold">Partner B</span>
-                  </div>
-                  <button className="w-full bg-slate-800 text-white font-semibold py-2 px-4 rounded-full mt-4">
-                    Deel
-                  </button>
-                </div>
-              )}
-
               {screen.screenType === "nextSteps" && (
                 <div className="space-y-4">
                   <a
@@ -322,30 +314,26 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                   transition={{ type: "spring", stiffness: 120, damping: 12 }}
                   className="w-full h-64 flex items-center justify-center"
                 >
-                  <div className="relative w-48 h-48 flex flex-col items-center justify-center border-2 border-blue-200 rounded-full">
-                    {screen.icon === "money-bag" && (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-10 w-10 text-blue-500 mb-2"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M3 10h18M7 15h1m4 0h1m-7 4h12a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v9a2 2 0 002 2zm0 0V8m0 11a2 2 0 100-4 2 2 0 000 4z"
-                        />
-                      </svg>
-                    )}
-                    <h2 className="text-3xl font-bold">
-                      <CountUp
-                        value={screen.value}
-                        formatter={(v) => `${screen.prefix || "€"}${Math.round(v)}`}
+                  <div className="relative w-48 h-48 flex flex-col items-center justify-center">
+                    <CircularProgressBar
                         isActive={isActive}
+                        value={screen.value ?? 0}
                       />
-                    </h2>
+
+                    <motion.div
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isActive ? 1 : 0 }}
+                      transition={{ delay: 1.5, duration: 0.5 }}
+                      className="absolute"
+                    >
+                      <h2 className="text-3xl font-bold">
+                        <CountUp
+                          value={screen.value || 0}
+                          formatter={(v) => `${screen.prefix || "€"}${Math.round(v)}`}
+                          isActive={isActive}
+                        />
+                      </h2>
+                    </motion.div>
                   </div>
                 </motion.div>
               )}
