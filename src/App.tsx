@@ -272,7 +272,7 @@ function Screen({
               </div>
 
               <div className="flex items-center space-x-2">
-                <img src="/logo.svg" className="w-10 h-10" />
+                <img src="/logo.png" className="w-10 h-10" />
                 <span className="text-2xl font-bold">PocketCFO</span>
               </div>
               <span className="bg-slate-800 text-white text-sm font-semibold px-4 py-2 rounded-full">
