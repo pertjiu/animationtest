@@ -162,11 +162,13 @@ export default function FinancialWrapped() {
         onDragEnd={handleSnap}
       >
         {screens.map((screen, index) => (
-          <Screen
-            key={screen.id}
-            screen={screen}
-            isActive={index === currentIndex}
-          />
+         <Screen
+          key={screen.id}
+          screen={screen}
+          isActive={index === currentIndex}
+          screens={screens}
+        />
+
         ))}
       </motion.div>
     </div>
@@ -220,8 +222,16 @@ function DynamicSubtitle({ screen }: { screen: ScreenType }) {
   );
 }
 
+function Screen({
+  screen,
+  isActive,
+  screens
+}: {
+  screen: ScreenType;
+  isActive: boolean;
+  screens: ScreenType[];
+}) {
 
-function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean }) {
   const ref = useRef(null);
 
   const maxKosten = screen.data && screen.graph === 'horizontal-bar'
@@ -295,7 +305,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                 )
               )}
 
-              {/* {screen.screenType === "summary" && (
+              {screen.screenType === "summary" && (
                 <div className="space-y-4">
                   <div className="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
                     <span className="font-medium">Netto Winst</span>
@@ -313,7 +323,7 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                     Deel
                   </button>
                 </div>
-              )} */}
+              )}
 
               {screen.screenType === "nextSteps" && (
                 <div className="space-y-4">
@@ -321,12 +331,12 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                     href="https://pocketcfo.io/nl/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full block bg-blue-500 text-white font-semibold py-2 px-4 rounded-full mt-4"
+                    className="w-full block bg-blue-50 text-white font-semibold py-2 px-4 rounded-full mt-4"
                   >
                     Bezoek PocketCFO
                   </a>
                   <p className="text-gray-600">
-                    Neem contact op met je partner voor meer informatie en advies.
+                    Of Neem contact op met je partner voor meer informatie en advies.
                   </p>
                 </div>
               )}
@@ -424,37 +434,51 @@ function Screen({ screen, isActive }: { screen: ScreenType; isActive: boolean })
                 </motion.div>
               )}
 
-
-                {screen.graph === "horizontal-bar" && screen.data && (
-                  <div className="w-full flex flex-col items-center justify-center space-y-4">
-                    {screen.data.map((item: any, index: number) => (
-                      <motion.div
-                        key={index}
-                        initial={{ opacity: 0, x: -50 }}
-                        animate={{ opacity: isActive ? 1 : 0, x: isActive ? 0 : -50 }}
-                        transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
-                        className="w-full"
-                      >
-                        <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
-                          <span className="font-medium">{item.name}</span>
-                          <span className="font-bold">
-                            <CountUp value={item.kosten} isActive={isActive} />
-                          </span>
-                        </div>
-                        <div className="h-2 bg-blue-200 rounded-full mt-1">
-                          <motion.div
-                            initial={{ width: 0 }}
-                            animate={{
-                              width: isActive ? `${(item.kosten / maxKosten) * 100}%` : "0%",
-                            }}
-                            transition={{ type: "spring", stiffness: 100, damping: 10, delay: index * 0.2 }}
-                            className="h-full bg-blue-500 rounded-full"
-                          ></motion.div>
-                        </div>
-                      </motion.div>
-                    ))}
-                  </div>
-                )}
+              {screen.graph === "horizontal-bar" && screen.data && (
+                <div className="w-full flex flex-col items-center justify-center space-y-4">
+                  {screen.data.map((item:any, index:number) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, x: -50 }}
+                      animate={{
+                        opacity: isActive ? 1 : 0,
+                        x: isActive ? 0 : -50,
+                      }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 100,
+                        damping: 10,
+                        delay: index * 0.2,
+                      }}
+                      className="w-full"
+                    >
+                      <div className="flex items-center justify-between bg-blue-100 rounded-lg p-3">
+                        <span className="font-medium">{item.name}</span>
+                        <span className="font-bold">
+                          <CountUp value={item.kosten} isActive={isActive} />
+                        </span>
+                      </div>
+                      <div className="h-2 bg-blue-200 rounded-full mt-1">
+                        <motion.div
+                          initial={{ width: 0 }}
+                          animate={{
+                            width: isActive
+                              ? `${(item.kosten / maxKosten) * 100}%`
+                              : "0%",
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 100,
+                            damping: 10,
+                            delay: index * 0.2,
+                          }}
+                          className="h-full bg-blue-500 rounded-full"
+                        ></motion.div>
+                      </div>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
 
               {screen.graph === "double-line" &&
                 screen.data &&
